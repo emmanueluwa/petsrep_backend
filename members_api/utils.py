@@ -1,0 +1,14 @@
+from wsgiref.util import setup_testing_defaults
+from django.core.mail import EmailMessage
+from petsrep import settings
+
+class Util:
+    @staticmethod
+    def send_email(data):
+        email = EmailMessage(
+            subject = data['email_subject'], 
+            body = data['email_body'], 
+            to = [data['to_email']],
+            from_email = settings.EMAIL_HOST_USER
+        )
+        email.send()
