@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qul_j3abi9p5n!*!dl-3s-j$uo2s&g7-81@t8l#6cjuqu5z$i*'
+SECRET_KEY = os.environ.get('PETS_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -87,7 +87,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         "NAME": "db_petsrep",
         "USER": "postgres",
-        "PASSWORD": "1admin",
+        "PASSWORD": os.environ.get('PETS_DB_PASSWORD'),
         "HOST": "localhost",
         "PORT": "5432",
 
@@ -157,9 +157,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = os.environ.get('PETS_EMAIL_HOST')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'fulphrone@gmail.com'
-EMAIL_HOST_PASSWORD = 'jbtwmutpkslrfzea'
+EMAIL_HOST_USER = os.environ.get('PETS_EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('PETS_EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
