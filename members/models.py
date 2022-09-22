@@ -35,5 +35,5 @@ class Profile(models.Model):
     
 
     def __str__(self):
-      return self.member.username
+      return f'Profile of {self.member.username}'
 
