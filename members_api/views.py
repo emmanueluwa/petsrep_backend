@@ -1,4 +1,5 @@
 from django.urls import reverse
+from rest_framework.response import Response, views, permissions
 from rest_framework.decorators import api_view
 from members_api.utils import Util
 from django.utils.http import urlsafe_base64_encode
@@ -9,7 +10,7 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 from django.contrib.auth.models import User
 from members.models import Profile
-from members_api.serializers import EmailSerializer, ProfileSerializer, MyTokenObtainPairSerializer, RegisterSerializer, ResetPasswordSerializer
+from members_api.serializers import EmailSerializer, ProfileSerializer, LoginSerializer, RegisterSerializer, ResetPasswordSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny
 from django.utils.encoding import force_bytes
@@ -30,9 +31,18 @@ class ProfileDetail(generics.RetrieveAPIView):
     serializer_class = ProfileSerializer
 
 
-class MyObtainTokenPairView(TokenObtainPairView):
-    permission_classes = (AllowAny,)
-    serializer_class = MyTokenObtainPairSerializer
+class LoginView(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        serializer = LoginSerializer(
+                        data = self.request.data,
+                        context = { 'request': self.request }
+                        )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return Response(None, status=status.HTTP_202_ACCEPTED)
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()

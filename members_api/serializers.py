@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth import authenticate
 from members.models import Profile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.models import User
@@ -21,16 +22,40 @@ class ProfileSerializer(serializers.ModelSerializer):
             'animal'
             )
          
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super(MyTokenObtainPairSerializer, cls).get_token(user)
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(
+        label = "Username",
+        write_only = True
+    )
+    password = serializers.CharField(
+        label = "Password",
+        style = {'input_type': 'password'},
+        trim_whitespace = False,
+        write_only = True
+    )
 
-        # Add custom custom claims
-        # token['username'] = user.username
-        # token['password'] = user.password
+    def validated(self, attributes):
+        username = attributes.get('username')
+        password = attributes.get('password')
+
+        if username and password:
+            #authenticate using django auth framework
+            user = authenticate(
+                        request = self.context.get('request'),
+                        username = username,
+                        password = password
+                        )
+            
+            if not user:
+                message = 'Access denied: wrong username or password'
+                raise serializers.ValidationError(message, code='authorization')
         
-        return token 
+        else:
+            message = 'Both "username" and "password" are required.'
+            raise serializers.ValidationError(message, code='authorization')
+        
+        attributes['user'] = user
+        return attributes
 
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
